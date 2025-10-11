@@ -24,10 +24,11 @@ import org.springframework.http.ResponseEntity;
 import com.example.explorecalijpa.business.TourRatingService;
 import com.example.explorecalijpa.model.Tour;
 import com.example.explorecalijpa.model.TourRating;
+import com.example.explorecalijpa.recommendation.TestSecurityConfig;
 
 import jakarta.validation.ConstraintViolationException;
 
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = {com.example.explorecalijpa.ExplorecaliJpaApplication.class, TestSecurityConfig.class})
 public class TourRatingControllerTest {
 
   // These Tour and rating id's do not already exist in the db

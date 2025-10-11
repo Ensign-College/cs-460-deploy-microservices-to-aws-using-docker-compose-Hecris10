@@ -1,4 +1,4 @@
-package edu.ensign.cs460.recommendation;
+package com.example.explorecalijpa.recommendation;
 
 import com.example.explorecalijpa.repo.TourRatingRepository;
 import org.junit.jupiter.api.BeforeEach;

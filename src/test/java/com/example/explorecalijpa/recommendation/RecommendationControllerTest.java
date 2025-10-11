@@ -1,4 +1,4 @@
-package edu.ensign.cs460.recommendation;
+package com.example.explorecalijpa.recommendation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Controller tests for RecommendationController.
  * Tests REST endpoint behavior, validation, and error handling.
  */
-@SpringBootTest(classes = {com.example.explorecalijpa.ExplorecaliJpaApplication.class})
+@SpringBootTest(classes = {com.example.explorecalijpa.ExplorecaliJpaApplication.class, TestSecurityConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @AutoConfigureMockMvc
 class RecommendationControllerTest {

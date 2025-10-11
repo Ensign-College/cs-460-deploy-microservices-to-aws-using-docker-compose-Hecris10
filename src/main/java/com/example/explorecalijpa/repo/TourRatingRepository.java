@@ -10,7 +10,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import com.example.explorecalijpa.model.TourRating;
-import edu.ensign.cs460.recommendation.TourSummary;
+import com.example.explorecalijpa.recommendation.TourSummary;
 
 /**
  * Tour Rating Repository Interface

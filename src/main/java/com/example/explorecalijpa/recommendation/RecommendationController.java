@@ -1,4 +1,4 @@
-package edu.ensign.cs460.recommendation;
+package com.example.explorecalijpa.recommendation;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

@@ -1,4 +1,4 @@
-package edu.ensign.cs460.recommendation;
+package com.example.explorecalijpa.recommendation;
 
 /**
  * DTO for Tour Recommendation API responses.
