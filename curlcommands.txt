@@ -1,10 +1,65 @@
-# Create a tour package
+# Authentication Credentials:
+# User: user/password (read access)
+# Admin: admin/admin123 (full access)
+
+# Create a tour package (requires admin)
 curl -X POST http://localhost:8080/packages \
+  -u admin:admin123 \
   -H 'Content-Type: application/json' \
   -d '{"code":"BB","name":"Beekeepers you Betcha"}'
 
-# List tour packages
-curl http://localhost:8080/packages
+# List tour packages (user can read)
+curl -u user:password http://localhost:8080/packages
 
-# Delete the tour package
-curl -X DELETE http://localhost:8080/packages/BB
+# Delete the tour package (requires admin)
+curl -X DELETE http://localhost:8080/packages/BB \
+  -u admin:admin123
+
+# Tour Rating Examples:
+
+# Get all ratings for a tour (user can read)
+curl -u user:password http://localhost:8080/tours/1/ratings
+
+# Get average rating for a tour (user can read)
+curl -u user:password http://localhost:8080/tours/1/ratings/average
+
+# Create a new rating (requires admin)
+curl -X POST http://localhost:8080/tours/1/ratings \
+  -u admin:admin123 \
+  -H 'Content-Type: application/json' \
+  -d '{"score":5,"comment":"Amazing tour!","customerId":123}'
+
+# Update a rating (requires admin)
+curl -X PUT http://localhost:8080/tours/1/ratings \
+  -u admin:admin123 \
+  -H 'Content-Type: application/json' \
+  -d '{"score":4,"comment":"Updated review","customerId":123}'
+
+# Delete a rating (requires admin)
+curl -X DELETE http://localhost:8080/tours/1/ratings/123 \
+  -u admin:admin123
+
+# Recommendation Endpoints (require authentication):
+
+# Get top 5 recommendations
+curl -u user:password http://localhost:8080/recommendations/top/5
+
+# Get customer-specific recommendations
+curl -u user:password http://localhost:8080/recommendations/customer/123?limit=5
+
+# Clear recommendation cache
+curl -X DELETE http://localhost:8080/recommendations/cache \
+  -u user:password
+
+# Testing Authentication Failures:
+
+# Try to create rating without credentials (should fail)
+curl -X POST http://localhost:8080/tours/1/ratings \
+  -H 'Content-Type: application/json' \
+  -d '{"score":5,"comment":"Should fail","customerId":123}'
+
+# Try to create rating with user credentials (should get 403 FORBIDDEN)
+curl -X POST http://localhost:8080/tours/1/ratings \
+  -u user:password \
+  -H 'Content-Type: application/json' \
+  -d '{"score":5,"comment":"Should be forbidden","customerId":123}'

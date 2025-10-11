@@ -31,20 +31,31 @@ Docker Compose launches a `mysql-db` service and a `jpa-app` service.
 
 ## Exercise the API
 
-After both containers are up, interact with the REST endpoints:
+After both containers are up, interact with the REST endpoints with authentication:
+
+### Authentication
+- **User**: `user/password` (read access)
+- **Admin**: `admin/admin123` (full access)
 
 ```bash
-# Create a tour package
+# Create a tour package (requires admin)
 curl -X POST http://localhost:8080/packages \
+  -u admin:admin123 \
   -H 'Content-Type: application/json' \
   -d '{"code":"BB","name":"Beekeepers you Betcha"}'
 
-# List tour packages
-curl http://localhost:8080/packages
+# List tour packages (user can read)
+curl -u user:password http://localhost:8080/packages
 
-# Delete the tour package
-curl -X DELETE http://localhost:8080/packages/BB
+# Delete the tour package (requires admin)
+curl -X DELETE http://localhost:8080/packages/BB \
+  -u admin:admin123
 ```
+
+### Postman Users
+Use **Authorization → Basic Auth** with the same usernames/passwords:
+- Reads: `user` / `password`
+- Mutations: `admin` / `admin123`
 
 Use `docker compose down` to stop the services when finished.
 
