@@ -19,12 +19,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 
 /**
  * Controller tests for RecommendationController.
  * Tests REST endpoint behavior, validation, and error handling.
  */
-@SpringBootTest(classes = {com.example.explorecalijpa.ExplorecaliJpaApplication.class, TestSecurityConfig.class})
+@SpringBootTest(classes = {com.example.explorecalijpa.ExplorecaliJpaApplication.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @AutoConfigureMockMvc
 class RecommendationControllerTest {
@@ -44,7 +45,7 @@ class RecommendationControllerTest {
     when(service.recommendTopN(5)).thenReturn(recommendations);
 
     // Act & Assert
-    mockMvc.perform(get("/recommendations/top/5"))
+    mockMvc.perform(get("/recommendations/top/5").with(httpBasic("user", "password")))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(2)))
@@ -60,13 +61,13 @@ class RecommendationControllerTest {
 
   @Test
   void testTopEndpoint_invalidLimit_returns400() throws Exception {
-    mockMvc.perform(get("/recommendations/top/0"))
+    mockMvc.perform(get("/recommendations/top/0").with(httpBasic("user", "password")))
         .andExpect(status().isBadRequest());
 
-    mockMvc.perform(get("/recommendations/top/-1"))
+    mockMvc.perform(get("/recommendations/top/-1").with(httpBasic("user", "password")))
         .andExpect(status().isBadRequest());
 
-    mockMvc.perform(get("/recommendations/top/101"))
+    mockMvc.perform(get("/recommendations/top/101").with(httpBasic("user", "password")))
         .andExpect(status().isBadRequest());
 
     verify(service, never()).recommendTopN(anyInt());
@@ -76,7 +77,7 @@ class RecommendationControllerTest {
   void testTopEndpoint_emptyResults_returns200WithEmptyArray() throws Exception {
     when(service.recommendTopN(anyInt())).thenReturn(Collections.emptyList());
 
-    mockMvc.perform(get("/recommendations/top/5"))
+    mockMvc.perform(get("/recommendations/top/5").with(httpBasic("user", "password")))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(0)));
@@ -89,7 +90,7 @@ class RecommendationControllerTest {
         new TourRecommendation(25, "Wine Country Day Trip", 4.6, 62L));
     when(service.recommendForCustomer(123, 5)).thenReturn(recommendations);
 
-    mockMvc.perform(get("/recommendations/customer/123?limit=5"))
+    mockMvc.perform(get("/recommendations/customer/123?limit=5").with(httpBasic("user", "password")))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(2)))
@@ -105,7 +106,7 @@ class RecommendationControllerTest {
   @Test
   void testCustomerEndpoint_defaultLimit_uses5() throws Exception {
     when(service.recommendForCustomer(eq(123), eq(5))).thenReturn(Collections.emptyList());
-    mockMvc.perform(get("/recommendations/customer/123"))
+    mockMvc.perform(get("/recommendations/customer/123").with(httpBasic("user", "password")))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(0)));
@@ -115,10 +116,10 @@ class RecommendationControllerTest {
 
   @Test
   void testCustomerEndpoint_invalidCustomerId_returns400() throws Exception {
-    mockMvc.perform(get("/recommendations/customer/0"))
+    mockMvc.perform(get("/recommendations/customer/0").with(httpBasic("user", "password")))
         .andExpect(status().isBadRequest());
 
-    mockMvc.perform(get("/recommendations/customer/-1"))
+    mockMvc.perform(get("/recommendations/customer/-1").with(httpBasic("user", "password")))
         .andExpect(status().isBadRequest());
 
     verify(service, never()).recommendForCustomer(anyInt(), anyInt());
@@ -126,10 +127,10 @@ class RecommendationControllerTest {
 
   @Test
   void testCustomerEndpoint_invalidLimit_returns400() throws Exception {
-    mockMvc.perform(get("/recommendations/customer/123?limit=0"))
+    mockMvc.perform(get("/recommendations/customer/123?limit=0").with(httpBasic("user", "password")))
         .andExpect(status().isBadRequest());
 
-    mockMvc.perform(get("/recommendations/customer/123?limit=101"))
+    mockMvc.perform(get("/recommendations/customer/123?limit=101").with(httpBasic("user", "password")))
         .andExpect(status().isBadRequest());
 
     verify(service, never()).recommendForCustomer(anyInt(), anyInt());
@@ -139,7 +140,7 @@ class RecommendationControllerTest {
   void testCustomerEndpoint_emptyResults_returns200WithEmptyArray() throws Exception {
     when(service.recommendForCustomer(anyInt(), anyInt())).thenReturn(Collections.emptyList());
 
-    mockMvc.perform(get("/recommendations/customer/456?limit=10"))
+    mockMvc.perform(get("/recommendations/customer/456?limit=10").with(httpBasic("user", "password")))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(0)));
@@ -149,7 +150,7 @@ class RecommendationControllerTest {
   void testClearCacheEndpoint_returns204() throws Exception {
     doNothing().when(service).evictAll();
 
-    mockMvc.perform(delete("/recommendations/cache"))
+    mockMvc.perform(delete("/recommendations/cache").with(httpBasic("admin", "admin123")))
         .andExpect(status().isNoContent());
 
     verify(service).evictAll();
@@ -158,11 +159,11 @@ class RecommendationControllerTest {
   @Test
   void testTopEndpoint_boundaryValues_valid() throws Exception {
     when(service.recommendTopN(1)).thenReturn(Collections.emptyList());
-    mockMvc.perform(get("/recommendations/top/1"))
+    mockMvc.perform(get("/recommendations/top/1").with(httpBasic("user", "password")))
         .andExpect(status().isOk());
 
     when(service.recommendTopN(100)).thenReturn(Collections.emptyList());
-    mockMvc.perform(get("/recommendations/top/100"))
+    mockMvc.perform(get("/recommendations/top/100").with(httpBasic("user", "password")))
         .andExpect(status().isOk());
 
     verify(service).recommendTopN(1);
@@ -173,7 +174,7 @@ class RecommendationControllerTest {
   void testCustomerEndpoint_customLimit_overridesDefault() throws Exception {
     when(service.recommendForCustomer(eq(789), eq(10))).thenReturn(Collections.emptyList());
 
-    mockMvc.perform(get("/recommendations/customer/789?limit=10"))
+    mockMvc.perform(get("/recommendations/customer/789?limit=10").with(httpBasic("user", "password")))
         .andExpect(status().isOk());
 
     verify(service).recommendForCustomer(789, 10);
